@@ -2,11 +2,12 @@ from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
-# Código de descuento y control de uso
+# Configuración del código de descuento
 CODIGO_DESCUENTO = "STARKBET"
 USOS_MAXIMOS = 20
 usos_actuales = 0
 
+# HTML con diseño azul oscuro y profesional
 html = """
 <!DOCTYPE html>
 <html lang="es">
@@ -35,8 +36,6 @@ html = """
             text-align: center;
         }
         a.btn {
-            display: inline-block;
-            margin-top: 10px;
             background-color: #008CBA;
             color: white;
             padding: 10px 15px;
@@ -45,13 +44,13 @@ html = """
             font-weight: bold;
         }
         a.whatsapp-btn {
-            display: inline-block;
             background-color: #25D366;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             text-decoration: none;
             font-weight: bold;
             border-radius: 5px;
+            display: inline-block;
             margin-top: 20px;
         }
         form {
@@ -75,13 +74,16 @@ html = """
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
         }
         .mensaje {
-            margin: 10px 0;
+            margin: 15px 0;
             font-weight: bold;
+            font-size: 1.1em;
         }
-        .ok { color: #0f0; }
-        .error { color: #f33; }
+        .ok { color: #00ff88; }
+        .error { color: #ff4d4d; }
     </style>
 </head>
 <body>
@@ -155,7 +157,6 @@ html = """
 def inicio():
     global usos_actuales
 
-    # Precios base
     precios = {
         "mensual": 65000,
         "trimestral": 177000,
@@ -163,7 +164,6 @@ def inicio():
         "anual": 790000
     }
 
-    # Links de AstroPay base
     links = {
         "mensual": "https://onetouch.astropay.com/payment?external_reference_id=yQhLPb2z0AxcipNOmAz9PMvcclXU1yU9",
         "trimestral": "https://onetouch.astropay.com/payment?external_reference_id=FIKYIzFSVKBBtyb8nXc5RxBOia5SwsQJ",
@@ -179,8 +179,8 @@ def inicio():
 
         if codigo == CODIGO_DESCUENTO:
             if usos_actuales < USOS_MAXIMOS:
-                for key in precios:
-                    precios[key] = int(precios[key] * 0.8)  # 20% descuento
+                for k in precios:
+                    precios[k] = int(precios[k] * 0.8)
                 usos_actuales += 1
                 mensaje = f"✅ ¡Descuento aplicado! Código válido para las primeras {USOS_MAXIMOS} personas. Te quedan {USOS_MAXIMOS - usos_actuales} usos disponibles."
                 clase = "ok"
