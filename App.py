@@ -2,118 +2,206 @@ from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
-DESCUENTO_CODIGO = "STARKBET"
-USOS_DISPONIBLES = 20
+# Código de descuento y control de uso
+CODIGO_DESCUENTO = "STARKBET"
+USOS_MAXIMOS = 20
 usos_actuales = 0
 
-HTML = '''
+html = """
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Stark Goals</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stark Goals VIP 🌌</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #0a0a0a; color: #fff; }
-        header { background: #111; padding: 20px; text-align: center; }
-        h1 { margin: 0; font-size: 2em; }
-        section { padding: 20px; }
-        .beneficio, .plan { margin-bottom: 15px; background: #1a1a1a; padding: 15px; border-radius: 8px; }
-        form { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 30px; }
+        body {
+            background-color: #0a0a23;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #00ccff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #111;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: center;
+        }
+        a.btn {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #008CBA;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        a.whatsapp-btn {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        form {
+            background-color: #111;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
         input[type="text"], input[type="email"] {
-            width: 100%; padding: 10px; margin-bottom: 10px; border: none; border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: none;
         }
         input[type="submit"] {
-            background: #e50914; color: #fff; border: none; padding: 10px 20px; border-radius: 5px;
+            background-color: #00ccff;
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
             cursor: pointer;
         }
-        .footer { text-align: center; font-size: 0.8em; color: #aaa; margin-top: 50px; }
-        .descuento { color: #0f0; font-weight: bold; }
-        .error { color: #f33; font-weight: bold; }
+        .mensaje {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .ok { color: #0f0; }
+        .error { color: #f33; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🔥 Stark Goals 🔥</h1>
-        <p>Tu nueva comunidad de predicciones deportivas inteligentes</p>
-    </header>
+    <h1>🌌 Stark Goals VIP 🌌</h1>
+    <p>Tu sistema profesional de apuestas deportivas con resultados comprobados.</p>
 
-    <section>
-        <h2>¿Por qué unirte?</h2>
-        <div class="beneficio">✅ Estadísticas en tiempo real</div>
-        <div class="beneficio">✅ Cuotas de valor diario</div>
-        <div class="beneficio">✅ Comunidad privada y soporte personalizado</div>
-    </section>
+    <h2>🙌 Únete a la comunidad:</h2>
+    <form method="POST">
+        <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <input type="email" name="correo" placeholder="Tu correo" required>
+        <input type="text" name="codigo" placeholder="Código de descuento (opcional)">
+        <input type="submit" value="Aplicar Código y Ver Precios">
+    </form>
 
-    <section>
-        <h2>💌 Únete con tu correo y obtén beneficios</h2>
-        <form method="POST" action="/">
-            <input type="text" name="nombre" placeholder="Tu nombre" required>
-            <input type="email" name="correo" placeholder="Tu correo electrónico" required>
-            <input type="text" name="codigo" placeholder="Código promocional (opcional)">
-            <input type="submit" value="Unirme ahora">
-        </form>
-        {% if mensaje %}
-            <p class="{{ clase }}">{{ mensaje }}</p>
-        {% endif %}
-    </section>
+    {% if mensaje %}
+    <p class="mensaje {{ clase }}">{{ mensaje }}</p>
+    {% endif %}
 
-    <section>
-        <h2>📦 Planes disponibles</h2>
-        <div class="plan">💥 Plan Mensual - {{ mensual }} COP</div>
-        <div class="plan">🔥 Plan Trimestral - {{ trimestral }} COP</div>
-        <div class="plan">💎 Plan Vitalicio - {{ vitalicio }} COP</div>
-    </section>
+    <h2>💰 Planes disponibles:</h2>
+    <table>
+        <tr>
+            <th>Plan</th>
+            <th>Duración</th>
+            <th>Precio</th>
+            <th>Pagar</th>
+        </tr>
+        <tr>
+            <td>Mensual</td>
+            <td>1 mes</td>
+            <td>${{ mensual }} COP</td>
+            <td><a href="{{ link_mensual }}" class="btn">Pagar</a></td>
+        </tr>
+        <tr>
+            <td>Trimestral</td>
+            <td>3 meses</td>
+            <td>${{ trimestral }} COP</td>
+            <td><a href="{{ link_trimestral }}" class="btn">Pagar</a></td>
+        </tr>
+        <tr>
+            <td>Semestral</td>
+            <td>6 meses</td>
+            <td>${{ semestral }} COP</td>
+            <td><a href="{{ link_semestral }}" class="btn">Pagar</a></td>
+        </tr>
+        <tr>
+            <td>Anual</td>
+            <td>12 meses</td>
+            <td>${{ anual }} COP</td>
+            <td><a href="{{ link_anual }}" class="btn">Pagar</a></td>
+        </tr>
+    </table>
 
-    <div class="footer">
-        &copy; 2025 Stark Goals. Todos los derechos reservados.
-    </div>
+    <h2>📲 Métodos de pago alternativos:</h2>
+    <p><strong>Nequi / Daviplata:</strong> 3117776320 (Daniel Padilla Marimón)</p>
+    <p><strong>PayPal:</strong> danielpadilla152018@gmail.com</p>
+
+    <h2>🧠 ¿Qué obtienes con tu suscripción?</h2>
+    <ul>
+        <li>✔ Acceso exclusivo al grupo <strong>Stark Goals VIP</strong></li>
+        <li>✔ Análisis estadístico profesional con más de 300 apuestas comprobadas</li>
+        <li>✔ Enfoque en rentabilidad a largo plazo</li>
+        <li>✔ Alertas diarias de valor y estrategias seguras</li>
+    </ul>
+
+    <a href="https://wa.me/573117776320" class="whatsapp-btn">📲 Contáctame por WhatsApp</a>
 </body>
 </html>
-'''
+"""
 
-@app.route("/", methods=["GET", "POST"])
-def index():
+@app.route('/', methods=['GET', 'POST'])
+def inicio():
     global usos_actuales
 
-    # Precios normales
+    # Precios base
     precios = {
-        "mensual": 30000,
-        "trimestral": 70000,
-        "vitalicio": 200000
+        "mensual": 65000,
+        "trimestral": 177000,
+        "semestral": 390000,
+        "anual": 790000
+    }
+
+    # Links de AstroPay base
+    links = {
+        "mensual": "https://onetouch.astropay.com/payment?external_reference_id=yQhLPb2z0AxcipNOmAz9PMvcclXU1yU9",
+        "trimestral": "https://onetouch.astropay.com/payment?external_reference_id=FIKYIzFSVKBBtyb8nXc5RxBOia5SwsQJ",
+        "semestral": "https://onetouch.astropay.com/payment?external_reference_id=dlrDIgquJRYEFAHZkN3wipC3Y8ekQHGV",
+        "anual": "https://onetouch.astropay.com/payment?external_reference_id=TByrspBzhDYFcCYSvXoqq8s04YBvb7YO"
     }
 
     mensaje = ""
     clase = ""
 
-    if request.method == "POST":
-        nombre = request.form["nombre"]
-        correo = request.form["correo"]
-        codigo = request.form["codigo"].strip().upper()
+    if request.method == 'POST':
+        codigo = request.form.get('codigo', '').strip().upper()
 
-        print(f"📬 Nuevo miembro: {nombre} - {correo} - Código: {codigo}")
-
-        if codigo == DESCUENTO_CODIGO:
-            if usos_actuales < USOS_DISPONIBLES:
-                # Aplicar 20% de descuento
+        if codigo == CODIGO_DESCUENTO:
+            if usos_actuales < USOS_MAXIMOS:
                 for key in precios:
-                    precios[key] = int(precios[key] * 0.8)
+                    precios[key] = int(precios[key] * 0.8)  # 20% descuento
                 usos_actuales += 1
-                mensaje = f"✅ Código aplicado. ¡Tienes un 20% de descuento! ({USOS_DISPONIBLES - usos_actuales} disponibles)"
-                clase = "descuento"
+                mensaje = f"✅ ¡Descuento aplicado! Código válido para las primeras {USOS_MAXIMOS} personas. Te quedan {USOS_MAXIMOS - usos_actuales} usos disponibles."
+                clase = "ok"
             else:
-                mensaje = "❌ Código STARKBET agotado. Ya fue usado por 20 personas."
+                mensaje = "❌ El código STARKBET ya fue usado por 20 personas."
                 clase = "error"
         elif codigo != "":
             mensaje = "⚠️ Código inválido. Asegúrate de escribirlo correctamente."
             clase = "error"
 
-    return render_template_string(HTML,
+    return render_template_string(html,
+                                  mensaje=mensaje,
+                                  clase=clase,
                                   mensual=precios["mensual"],
                                   trimestral=precios["trimestral"],
-                                  vitalicio=precios["vitalicio"],
-                                  mensaje=mensaje,
-                                  clase=clase)
+                                  semestral=precios["semestral"],
+                                  anual=precios["anual"],
+                                  link_mensual=links["mensual"],
+                                  link_trimestral=links["trimestral"],
+                                  link_semestral=links["semestral"],
+                                  link_anual=links["anual"])
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+if __name__ == '__main__':
+    app.run(debug=True)
