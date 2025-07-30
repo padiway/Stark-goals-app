@@ -6,6 +6,7 @@ app = Flask(__name__)
 CODIGO_DESCUENTO = "STARKBET"
 USOS_MAXIMOS = 20
 usos_actuales = 0
+correos_usados = set()
 
 # HTML con diseño azul oscuro y profesional
 html = """
@@ -83,7 +84,6 @@ html = """
             font-size: 1.1em;
         }
         .ok { color: #00ff88; }
-        .error { color: #ff4d4d; }
     </style>
 </head>
 <body>
@@ -113,25 +113,25 @@ html = """
         <tr>
             <td>Mensual</td>
             <td>1 mes</td>
-            <td>${{ mensual }} COP</td>
+            <td>${{ "{:,.0f}".format(mensual).replace(",", ".") }} COP</td>
             <td><a href="{{ link_mensual }}" class="btn">Pagar</a></td>
         </tr>
         <tr>
             <td>Trimestral</td>
             <td>3 meses</td>
-            <td>${{ trimestral }} COP</td>
+            <td>${{ "{:,.0f}".format(trimestral).replace(",", ".") }} COP</td>
             <td><a href="{{ link_trimestral }}" class="btn">Pagar</a></td>
         </tr>
         <tr>
             <td>Semestral</td>
             <td>6 meses</td>
-            <td>${{ semestral }} COP</td>
+            <td>${{ "{:,.0f}".format(semestral).replace(",", ".") }} COP</td>
             <td><a href="{{ link_semestral }}" class="btn">Pagar</a></td>
         </tr>
         <tr>
             <td>Anual</td>
             <td>12 meses</td>
-            <td>${{ anual }} COP</td>
+            <td>${{ "{:,.0f}".format(anual).replace(",", ".") }} COP</td>
             <td><a href="{{ link_anual }}" class="btn">Pagar</a></td>
         </tr>
     </table>
@@ -155,7 +155,7 @@ html = """
 
 @app.route('/', methods=['GET', 'POST'])
 def inicio():
-    global usos_actuales
+    global usos_actuales, correos_usados
 
     precios = {
         "mensual": 65000,
@@ -175,21 +175,17 @@ def inicio():
     clase = ""
 
     if request.method == 'POST':
+        correo = request.form.get('correo', '').strip().lower()
         codigo = request.form.get('codigo', '').strip().upper()
 
-        if codigo == CODIGO_DESCUENTO:
-            if usos_actuales < USOS_MAXIMOS:
-                for k in precios:
-                    precios[k] = int(precios[k] * 0.8)
-                usos_actuales += 1
-                mensaje = f"✅ ¡Descuento aplicado! Código válido para las primeras {USOS_MAXIMOS} personas. Te quedan {USOS_MAXIMOS - usos_actuales} usos disponibles."
-                clase = "ok"
-            else:
-                mensaje = "❌ El código STARKBET ya fue usado por 20 personas."
-                clase = "error"
-        elif codigo != "":
-            mensaje = "⚠️ Código inválido. Asegúrate de escribirlo correctamente."
-            clase = "error"
+        if codigo == CODIGO_DESCUENTO and usos_actuales < USOS_MAXIMOS and correo not in correos_usados:
+            for k in precios:
+                precios[k] = int(precios[k] * 0.8)
+            usos_actuales += 1
+            correos_usados.add(correo)
+            mensaje = "✅ ¡Descuento aplicado correctamente!"
+            clase = "ok"
+        # Si el código es inválido o ya usado, no muestra mensaje ni aplica descuento
 
     return render_template_string(html,
                                   mensaje=mensaje,
