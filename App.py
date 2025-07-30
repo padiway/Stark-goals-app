@@ -157,10 +157,10 @@ def inicio():
 
     # Precios base
     precios = {
-        "mensual": 65.000,
-        "trimestral": 177.000,
-        "semestral": 390.000,
-        "anual": 790.000
+        "mensual": 65000,
+        "trimestral": 177000,
+        "semestral": 390000,
+        "anual": 790000
     }
 
     # Links de AstroPay base
