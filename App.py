@@ -71,7 +71,7 @@ html = """
 
     <h2>📲 Métodos de pago:</h2>
     <p><strong>Nequi / Daviplata:</strong> 3117776320 (Daniel Padilla Marimón)</p>
-    <p><strong>PayPal:</strong> <a href="mailto:danielmarimon1320@gmail.com">danielmarimon1320@gmail.com</a></p>
+    <p><strong>PayPal:</strong> <a href="mailto: danielpadilla152018@gmail.com">danielpadilla152018@gmail.com</a></p>
 
     <h3>💸 Pagos con AstroPay:</h3>
     <a class="payment-link" href="https://onetouch.astropay.com/payment?external_reference_id=yQhLPb2z0AxcipNOmAz9PMvcclXU1yU9" target="_blank">Mensual - $65,000</a>
